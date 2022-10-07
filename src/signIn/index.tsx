@@ -1,5 +1,6 @@
 import { Button, Form, Input, message } from "antd";
 import { useRouter } from "next/router";
+import styles from "./signIn.module.css";
 
 interface ISignIn {
   signIn: (username: string, password: string) => Promise<boolean | undefined>;
@@ -23,35 +24,37 @@ function SignIn({ signIn }: ISignIn) {
   };
 
   return (
-    <Form
-      name="basic"
-      onFinish={onFinish}
-      autoComplete="off"
-      labelCol={{ span: 6 }}
-      wrapperCol={{ span: 10 }}
-    >
-      <Form.Item
-        label="Username"
-        name="username"
-        rules={[{ required: true, message: "Please input your username!" }]}
+    <div className={styles.wrapper}>
+        <h1 className={styles.title}>Sign In </h1>
+      <Form
+        name="basic"
+        onFinish={onFinish}
+        labelCol={{ span: 7 }}
+        wrapperCol={{ span: 17 }}
       >
-        <Input />
-      </Form.Item>
+        <Form.Item
+          label="Username"
+          name="username"
+          rules={[{ required: true, message: "Please input your username!" }]}
+        >
+          <Input />
+        </Form.Item>
 
-      <Form.Item
-        label="Password"
-        name="password"
-        rules={[{ required: true, message: "Please input your password!" }]}
-      >
-        <Input.Password />
-      </Form.Item>
+        <Form.Item
+          label="Password"
+          name="password"
+          rules={[{ required: true, message: "Please input your password!" }]}
+        >
+          <Input.Password />
+        </Form.Item>
 
-      <Form.Item wrapperCol={{ offset: 8, span: 16 }}>
-        <Button type="primary" htmlType="submit">
-          Submit
-        </Button>
-      </Form.Item>
-    </Form>
+        <Form.Item wrapperCol={{ offset: 8, span: 16 }}>
+          <Button type="primary" htmlType="submit">
+            Submit
+          </Button>
+        </Form.Item>
+      </Form>
+    </div>
   );
 }
 export default SignIn;
