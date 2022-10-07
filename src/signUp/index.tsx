@@ -2,6 +2,7 @@ import React from "react";
 import { Button, Form, Input, message } from "antd";
 import ConfirmSignUp from "../confirmSignUp";
 import { confirmSignUp, resendConfirmationCode } from "../auth";
+import styles from "./signIn.module.css";
 
 interface IUser {
   username: string;
@@ -29,13 +30,14 @@ const SignUp = ({ signUp }: ISignUp) => {
   };
 
   return (
-    <>
+    <div className={styles.wrapper}>
+      <h1 className={styles.title}>SignUp </h1>
       <Form
         name="SignUp Form"
         onFinish={onFinish}
-        autoComplete="on"
-        labelCol={{ span: 6 }}
-        wrapperCol={{ span: 10 }}
+        labelCol={{ span: 7 }}
+        wrapperCol={{ span: 17 }}
+        className={styles.wrapper}
       >
         <Form.Item
           label="Username"
@@ -66,7 +68,7 @@ const SignUp = ({ signUp }: ISignUp) => {
         setIsModalOpen={setVisible}
         username={user ? user?.username : ""}
       />
-    </>
+    </div>
   );
 };
 
