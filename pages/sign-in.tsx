@@ -1,8 +1,8 @@
-import * as React from 'react'
-import SignIn from '../src/signIn'
-import {signIn} from '../src/auth'
+import type { NextPage } from "next";
+import { signIn } from '../src/auth';
+import SignIn from '../src/signIn';
 
-const Auth = () => {
+const Auth: NextPage = () => {
   return (
     <SignIn signIn={signIn}/>
   )
