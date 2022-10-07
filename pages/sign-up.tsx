@@ -1,7 +1,8 @@
+import type { NextPage } from "next";
+import { confirmSignUp, resendConfirmationCode, signUp } from "../src/auth";
 import SignUp from "../src/signUp";
-import { signUp, resendConfirmationCode, confirmSignUp } from "../src/auth";
 
-const AuthSignUp = () => {
+const AuthSignUp: NextPage = () => {
   return (
     <SignUp
       signUp={signUp}
