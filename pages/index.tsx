@@ -1,9 +1,45 @@
-import type { NextPage } from "next";
+import * as React from "react";
 import Head from "next/head";
 import Image from "next/image";
 import styles from "../styles/Home.module.css";
+import { Button, Form, Input } from "antd";
+import { API, graphqlOperation } from "aws-amplify";
+import { GraphQLResult } from "@aws-amplify/api";
+import { listTodos } from "../src/graphql/queries";
+import { createTodo } from "../src/graphql/mutations";
+import Link from "next/link";
+import { ListTodosQuery } from "../src/API";
 
-const Home: NextPage = () => {
+interface Itodo {
+  name: string;
+  description: string;
+}
+
+interface IHome {
+  props: {
+    data: Itodo[];
+  };
+}
+
+export async function getStaticProps() {
+  const { data } = (await API.graphql(
+    graphqlOperation(listTodos)
+  )) as GraphQLResult<ListTodosQuery>;
+  return { props: { data: data?.listTodos?.items } };
+}
+
+const addTodo = async (todo: Itodo) => {
+  await API.graphql(graphqlOperation(createTodo, { input: todo }));
+};
+
+const Home = ( {data} :IHome) => {
+ 
+  const [form] = Form.useForm();
+
+  const onFinish = (todo: Itodo) => {
+    addTodo(todo);
+  };
+
   return (
     <div className={styles.container}>
       <Head>
@@ -13,8 +49,40 @@ const Home: NextPage = () => {
       </Head>
 
       <main className={styles.main}>
-        <a href="/sign-in">SignIn</a>
-        <a href="/sign-up">SignUp</a>
+        <div>
+
+        <Link href="/sign-in">
+          <a>SignIn</a>
+        </Link>
+        <Link href="/sign-up">
+          <a>SignUp</a>
+        </Link>
+        </div>
+        <div>
+          <Form form={form} onFinish={onFinish} name="todoForm">
+            <Form.Item label="Name" name="name">
+              <Input placeholder="Todo name" />
+            </Form.Item>
+            <Form.Item label="Description" name="description">
+              <Input placeholder="Todo description" />
+            </Form.Item>
+            <Form.Item>
+              <Button type="primary" htmlType="submit">
+                Submit
+              </Button>
+            </Form.Item>
+          </Form>
+    
+          {React.Children.toArray(
+            data.map((item) => (
+              // eslint-disable-next-line react/jsx-key
+              <ul>
+                <li>{item.name}</li>
+                <li>{item.description}</li>
+              </ul>
+            ))
+          )}
+        </div>
       </main>
 
       <footer className={styles.footer}>

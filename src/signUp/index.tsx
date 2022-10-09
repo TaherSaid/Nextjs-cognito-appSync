@@ -2,7 +2,7 @@ import React from "react";
 import { Button, Form, Input, message } from "antd";
 import ConfirmSignUp from "../confirmSignUp";
 import { confirmSignUp, resendConfirmationCode } from "../auth";
-import styles from "./signIn.module.css";
+import styles from "./signup.module.css";
 
 interface IUser {
   username: string;

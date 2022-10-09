@@ -1,19 +1,22 @@
 {
-  "staging": {
+  "dev": {
     "awscloudformation": {
-      "AuthRoleName": "amplify-nextjsauth-staging-125550-authRole",
-      "UnauthRoleArn": "arn:aws:iam::428694054282:role/amplify-nextjsauth-staging-125550-unauthRole",
-      "AuthRoleArn": "arn:aws:iam::428694054282:role/amplify-nextjsauth-staging-125550-authRole",
-      "Region": "eu-central-1",
-      "DeploymentBucketName": "amplify-nextjsauth-staging-125550-deployment",
-      "UnauthRoleName": "amplify-nextjsauth-staging-125550-unauthRole",
-      "StackName": "amplify-nextjsauth-staging-125550",
-      "StackId": "arn:aws:cloudformation:eu-central-1:428694054282:stack/amplify-nextjsauth-staging-125550/34497440-4576-11ed-85a4-0ae4239508ea",
-      "AmplifyAppId": "d3f1co8lmzwgbq"
+      "AuthRoleName": "amplify-nextjscognitoappsync-dev-112016-authRole",
+      "UnauthRoleArn": "arn:aws:iam::428694054282:role/amplify-nextjscognitoappsync-dev-112016-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::428694054282:role/amplify-nextjscognitoappsync-dev-112016-authRole",
+      "Region": "us-east-1",
+      "DeploymentBucketName": "amplify-nextjscognitoappsync-dev-112016-deployment",
+      "UnauthRoleName": "amplify-nextjscognitoappsync-dev-112016-unauthRole",
+      "StackName": "amplify-nextjscognitoappsync-dev-112016",
+      "StackId": "arn:aws:cloudformation:us-east-1:428694054282:stack/amplify-nextjscognitoappsync-dev-112016/f8ec5e10-47bb-11ed-a4c4-0a29ebbcbe55",
+      "AmplifyAppId": "d304nsqobt2h0c"
     },
     "categories": {
+      "api": {
+        "nextjscognitoappsync": {}
+      },
       "auth": {
-        "NextJsAuth": {}
+        "nextjscognitoappsyncda5cee0f": {}
       }
     }
   }

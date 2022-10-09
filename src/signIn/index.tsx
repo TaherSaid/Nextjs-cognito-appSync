@@ -16,6 +16,8 @@ function SignIn({ signIn }: ISignIn) {
 
   const onFinish = async ({ username, password }: IOnFinish) => {
     const signInRe = await signIn(username, password);
+    console.log(signInRe);
+    
     if (signInRe) {
       router.push("/app/");
     } else {
