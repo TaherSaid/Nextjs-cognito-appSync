@@ -1,4 +1,4 @@
-import { Button, Form, Input, List } from "antd";
+import { Button, Form, Input, List, message } from "antd";
 import { API, withSSRContext } from "aws-amplify";
 import { GraphQLResult } from "@aws-amplify/api";
 import { GetServerSidePropsContext } from "next";
@@ -9,6 +9,7 @@ import { signOut } from "../../src/auth";
 import { createTodo } from "../../src/graphql/mutations";
 import { listTodos } from "../../src/graphql/queries";
 import styles from "../../styles/app.module.css";
+
 interface ITodo {
   name: string;
   description: string;
@@ -16,7 +17,7 @@ interface ITodo {
 
 interface IProps {
   email: string;
-  todoListItem?: ListTodosQuery;
+  todoListItems?: ListTodosQuery;
 }
 
 interface IGetServerSideProps {
@@ -25,24 +26,26 @@ interface IGetServerSideProps {
 
 const addTodo = async (todo: ITodo) => {
   try {
-    const data = await API.graphql({
+    await API.graphql({
       authMode: "AMAZON_COGNITO_USER_POOLS",
       query: createTodo,
       variables: { input: todo },
     });
-    console.log(data);
-  } catch (error) {
-    console.log(error);
+  } catch (error: any) {
+    message.error(error);
   }
 };
 
 const getListTodo = async () => {
-  const { data } = (await API.graphql({
-    query: listTodos,
-    authMode: "AMAZON_COGNITO_USER_POOLS",
-  })) as GraphQLResult<ListTodosQuery>;
-
-  return data;
+  try {
+    const { data } = (await API.graphql({
+      query: listTodos,
+      authMode: "AMAZON_COGNITO_USER_POOLS",
+    })) as GraphQLResult<ListTodosQuery>;
+    return data;
+  } catch (error: any) {
+    message.error(error);
+  }
 };
 
 export async function getServerSideProps({
@@ -59,29 +62,24 @@ export async function getServerSideProps({
   })) as GraphQLResult<ListTodosQuery>;
 
   return {
-    props: { email, todoListItem: data },
+    props: { email, todoListItems: data },
   };
 }
 
-const Home = ({ email, todoListItem }: IProps) => {
+const Home = ({ email, todoListItems }: IProps) => {
   const [todoList, setTodoList] = React.useState<ListTodosQuery | undefined>(
-    todoListItem
+    todoListItems
   );
-  const [reload, setReload] = React.useState<boolean>(false);
 
   const router = useRouter();
-  const [form] = Form.useForm();
 
   const onFinish = (todo: ITodo) => {
-    addTodo(todo);
-    setReload(!reload);
-  };
-
-  React.useEffect(() => {
-    getListTodo().then((todosLists) => {
-      setTodoList(todosLists);
+    addTodo(todo).then(() => {
+      getListTodo().then((todosLists) => {
+        setTodoList(todosLists);
+      });
     });
-  }, [reload]);
+  };
 
   return (
     <>
@@ -92,7 +90,7 @@ const Home = ({ email, todoListItem }: IProps) => {
         </Button>
       </div>
       <div className={styles.formWrapper}>
-        <Form form={form} onFinish={onFinish} name="todoForm">
+        <Form onFinish={onFinish} name="todoForm">
           <Form.Item label="Name" name="name">
             <Input placeholder="Todo name" />
           </Form.Item>
