@@ -2,7 +2,7 @@ import * as React from "react";
 import Head from "next/head";
 import Image from "next/image";
 import styles from "../styles/Home.module.css";
-import { Button, Form, Input } from "antd";
+import { Button, Form, Input, List, message } from "antd";
 import { API, graphqlOperation } from "aws-amplify";
 import { GraphQLResult } from "@aws-amplify/api";
 import { listTodos } from "../src/graphql/queries";
@@ -10,34 +10,60 @@ import { createTodo } from "../src/graphql/mutations";
 import Link from "next/link";
 import { ListTodosQuery } from "../src/API";
 
-interface Itodo {
+interface ITodo {
   name: string;
   description: string;
 }
 
-interface IHome {
+interface IHomeProps {
+  todoListItems?: ListTodosQuery;
+}
+
+interface IGetStaticProps {
   props: {
-    data: Itodo[];
+    todoListItems?: ListTodosQuery;
   };
 }
 
-export async function getStaticProps() {
-  const { data } = (await API.graphql(
-    graphqlOperation(listTodos)
-  )) as GraphQLResult<ListTodosQuery>;
-  return { props: { data: data?.listTodos?.items } };
-}
-
-const addTodo = async (todo: Itodo) => {
-  await API.graphql(graphqlOperation(createTodo, { input: todo }));
+const addTodo = async (todo: ITodo) => {
+  try {
+    await API.graphql(graphqlOperation(createTodo, { input: todo }));
+  } catch (error: any) {
+    message.error(error);
+  }
 };
 
-const Home = ( {data} :IHome) => {
- 
-  const [form] = Form.useForm();
+const getListTodo = async () => {
+  try {
+    const { data } = (await API.graphql({
+      query: listTodos,
+      variables: { filter: { userId: { attributeExists: false } } },
+    })) as GraphQLResult<ListTodosQuery>;
+    return data;
+  } catch (error: any) {
+    message.error(error);
+  }
+};
 
-  const onFinish = (todo: Itodo) => {
-    addTodo(todo);
+export async function getStaticProps(): Promise<IGetStaticProps> {
+  const { data } = (await API.graphql({
+    query: listTodos,
+    variables: { filter: { userId: { attributeExists: false } } },
+  })) as GraphQLResult<ListTodosQuery>;
+  return { props: { todoListItems: data } };
+}
+
+const Home = ({ todoListItems }: IHomeProps) => {
+  const [todoList, setTodoList] = React.useState<ListTodosQuery | undefined>(
+    todoListItems
+  );
+
+  const onFinish = (todo: ITodo) => {
+    addTodo(todo).then(() => {
+      getListTodo().then((todosLists) => {
+        setTodoList(todosLists);
+      });
+    });
   };
 
   return (
@@ -49,17 +75,16 @@ const Home = ( {data} :IHome) => {
       </Head>
 
       <main className={styles.main}>
-        <div>
-
-        <Link href="/sign-in">
-          <a>SignIn</a>
-        </Link>
-        <Link href="/sign-up">
-          <a>SignUp</a>
-        </Link>
+        <div className={styles.header}>
+          <Link href="/sign-in">
+            <a>SignIn</a>
+          </Link>
+          <Link href="/sign-up">
+            <a>SignUp</a>
+          </Link>
         </div>
         <div>
-          <Form form={form} onFinish={onFinish} name="todoForm">
+          <Form onFinish={onFinish} name="todoForm">
             <Form.Item label="Name" name="name">
               <Input placeholder="Todo name" />
             </Form.Item>
@@ -72,26 +97,26 @@ const Home = ( {data} :IHome) => {
               </Button>
             </Form.Item>
           </Form>
-    
-          {React.Children.toArray(
-            data.map((item) => (
-              // eslint-disable-next-line react/jsx-key
-              <ul>
-                <li>{item.name}</li>
-                <li>{item.description}</li>
-              </ul>
-            ))
-          )}
+        </div>
+        <div className={styles.listWrapper}>
+          <List
+            itemLayout="horizontal"
+            dataSource={todoList?.listTodos?.items}
+            renderItem={(item) => (
+              <List.Item>
+                <List.Item.Meta
+                  title={item?.name}
+                  description={item?.description}
+                />
+              </List.Item>
+            )}
+          />
         </div>
       </main>
 
       <footer className={styles.footer}>
-        <a
-          href="https://vercel.com?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Powered by{" "}
+        <a href="#" target="_blank" rel="noopener noreferrer">
+          Powered by
           <span className={styles.logo}>
             <Image src="/vercel.svg" alt="Vercel Logo" width={72} height={16} />
           </span>
