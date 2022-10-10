@@ -3,9 +3,10 @@
 
 type Todo  @model @auth(rules: [
   { allow: public},
-  { allow: owner }
+  { allow: owner, ownerField: "userId" }
 ]) {
   id: ID!
   name: String!
   description: String
+  userId:ID
 }
