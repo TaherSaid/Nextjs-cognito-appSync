@@ -3,7 +3,8 @@ import { useRouter } from "next/router";
 import styles from "./signIn.module.css";
 
 interface ISignIn {
-  signIn: (username: string, password: string) => Promise<boolean | undefined>;
+  signIn: any;
+  // signIn: (username: string, password: string) => Promise<boolean | undefined>;
 }
 
 interface IOnFinish {

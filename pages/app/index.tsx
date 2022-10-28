@@ -1,7 +1,7 @@
-import { Button, Form, Input, List, message } from "antd";
-import { API, withSSRContext } from "aws-amplify";
 import { GraphQLResult } from "@aws-amplify/api";
-import { GetServerSidePropsContext } from "next";
+import { Button, Form, Input, List, message } from "antd";
+import { API } from "aws-amplify";
+import { useSession } from "next-auth/client";
 import { useRouter } from "next/router";
 import * as React from "react";
 import { ListTodosQuery } from "../../src/API";
@@ -16,31 +16,31 @@ interface ITodo {
 }
 
 interface IProps {
-  email: string;
   todoListItems?: ListTodosQuery;
 }
 
-interface IGetServerSideProps {
-  props: IProps;
-}
-
-const addTodo = async (todo: ITodo) => {
+const addTodo = async (todo: ITodo, user: string) => {
   try {
     await API.graphql({
-      authMode: "AMAZON_COGNITO_USER_POOLS",
       query: createTodo,
-      variables: { input: todo },
+      variables: {
+        input: {
+          name: todo.name,
+          description: todo.description,
+          userId: user,
+        },
+      },
     });
   } catch (error: any) {
     message.error(error);
   }
 };
 
-const getListTodo = async () => {
+const getListTodo = async (email: string) => {
   try {
     const { data } = (await API.graphql({
       query: listTodos,
-      authMode: "AMAZON_COGNITO_USER_POOLS",
+      variables: { filter: { userId: { eq: email } } },
     })) as GraphQLResult<ListTodosQuery>;
     return data;
   } catch (error: any) {
@@ -48,37 +48,30 @@ const getListTodo = async () => {
   }
 };
 
-export async function getServerSideProps({
-  req,
-}: {
-  req: GetServerSidePropsContext;
-}): Promise<IGetServerSideProps> {
-  const SSR = withSSRContext({ req });
-  const currentSession = await SSR.Auth.currentSession();
-  const { email } = currentSession.idToken.payload;
-  const { data } = (await SSR.API.graphql({
-    query: listTodos,
-    authMode: "AMAZON_COGNITO_USER_POOLS",
-  })) as GraphQLResult<ListTodosQuery>;
-
-  return {
-    props: { email, todoListItems: data },
-  };
-}
-
-const Home = ({ email, todoListItems }: IProps) => {
+const Home = ({ todoListItems }: IProps) => {
+  const [session] = useSession();
+  const router = useRouter();
   const [todoList, setTodoList] = React.useState<ListTodosQuery | undefined>(
     todoListItems
   );
+  const email = session?.user?.name;
 
-  const router = useRouter();
-
-  const onFinish = (todo: ITodo) => {
-    addTodo(todo).then(() => {
-      getListTodo().then((todosLists) => {
+  React.useEffect(() => {
+    if (email) {
+      getListTodo(email).then((todosLists) => {
         setTodoList(todosLists);
       });
-    });
+    }
+  }, [email]);
+
+  const onFinish = (todo: ITodo) => {
+    if (email) {
+      addTodo(todo, session?.user?.email as string).then(() => {
+        getListTodo(email).then((todosLists) => {
+          setTodoList(todosLists);
+        });
+      });
+    }
   };
 
   return (
