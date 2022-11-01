@@ -3,27 +3,14 @@ import { useRouter } from "next/router";
 import styles from "./signIn.module.css";
 
 interface ISignIn {
-  signIn: any;
-  // signIn: (username: string, password: string) => Promise<boolean | undefined>;
+  signIn: (values: { email: string; password: string }) => void;
 }
 
-interface IOnFinish {
-  username: string;
-  password: string;
-}
 
 function SignIn({ signIn }: ISignIn) {
-  const router = useRouter();
 
-  const onFinish = async ({ username, password }: IOnFinish) => {
-    const signInRe = await signIn(username, password);
-    console.log(signInRe);
-    
-    if (signInRe) {
-      router.push("/app/");
-    } else {
-      message.error("An error occured while signIn");
-    }
+  const onFinish = async (values: { email: string; password: string }) => {
+      await signIn(values)
   };
 
   return (
@@ -36,8 +23,8 @@ function SignIn({ signIn }: ISignIn) {
         wrapperCol={{ span: 17 }}
       >
         <Form.Item
-          label="Username"
-          name="username"
+          label="email"
+          name="email"
           rules={[{ required: true, message: "Please input your username!" }]}
         >
           <Input />

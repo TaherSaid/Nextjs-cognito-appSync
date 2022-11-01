@@ -9,8 +9,6 @@ import { listTodos } from "../src/graphql/queries";
 import { createTodo } from "../src/graphql/mutations";
 import Link from "next/link";
 import { ListTodosQuery } from "../src/API";
-import {useSession,signIn,signOut} from "next-auth/client"
-
 
 interface ITodo {
   name: string;
@@ -84,8 +82,8 @@ const Home = ({ todoListItems }: IHomeProps) => {
           <Link href="/sign-up">
             <a>SignUp</a>
           </Link>
-          <Button onClick={()=>signIn('cognito').then((res)=>console.log(res)
-                  )}>LogIn</Button>
+          {/* <Button onClick={()=>signIn('cognito').then((res)=>console.log(res)
+                  )}>LogIn</Button> */}
         </div>
         <div>
           <Form onFinish={onFinish} name="todoForm">

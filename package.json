@@ -10,11 +10,13 @@
     "clean": "yarn cache clean -all"
   },
   "dependencies": {
+    "@aws-sdk/client-appsync": "^3.199.0",
+    "amazon-cognito-identity-js": "^5.2.12",
     "antd": "^4.23.4",
     "aws-amplify": "^4.3.37",
     "emotion": "^11.0.0",
     "next": "12.3.1",
-    "next-auth": "^3.13.1",
+    "next-auth": "^4.10.3",
     "react": "18.2.0",
     "react-dom": "18.2.0"
   },
